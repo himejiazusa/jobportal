@@ -1,0 +1,7 @@
+Django==4.2.x
+djangorestframework==3.14.x
+psycopg2-binary==2.9.x
+Pillow==9.5.x
+redis==4.6.x
+celery==5.3.x
+django-crispy-forms==2.0.x

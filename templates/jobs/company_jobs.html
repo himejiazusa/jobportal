@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}掲載中の求人 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>掲載中の求人</h1>
+        <a href="{% url 'jobs:create_job' %}" class="btn btn-primary">新規求人登録</a>
+    </div>
+    
+    {% if jobs %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>タイトル</th>
+                        <th>勤務地</th>
+                        <th>雇用形態</th>
+                        <th>掲載日</th>
+                        <th>ステータス</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                        <tr>
+                            <td><a href="{% url 'jobs:job_detail' job.id %}">{{ job.title }}</a></td>
+                            <td>{{ job.location }}</td>
+                            <td>{{ job.get_job_type_display }}</td>
+                            <td>{{ job.posted_date|date:"Y/m/d" }}</td>
+                            <td>
+                                {% if job.is_active %}
+                                    <span class="badge bg-success">掲載中</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">非掲載</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'jobs:edit_job' job.id %}" class="btn btn-outline-primary">編集</a>
+                                    <a href="{% url 'jobs:view_applicants' job.id %}" class="btn btn-outline-info">応募者</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>掲載中の求人はありません。</p>
+            <p class="mb-0">「新規求人登録」ボタンから求人を登録しましょう。</p>
+        </div>
+    {% endif %}
+    
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">求人掲載のヒント</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>魅力的なタイトルと説明</h6>
+                    <p>求職者の目を引くタイトルと、具体的な業務内容や企業の魅力を伝える説明文を心がけましょう。</p>
+                </div>
+                <div class="col-md-4">
+                    <h6>適切な給与情報</h6>
+                    <p>実際の給与範囲を明示することで、ミスマッチを減らし、質の高い応募を集めることができます。</p>
+                </div>
+                <div class="col-md-4">
+                    <h6>定期的な更新</h6>
+                    <p>求人情報は定期的に更新し、常に最新の状態を保つことで応募率が向上します。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

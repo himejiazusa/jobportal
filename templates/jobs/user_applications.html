@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}応募履歴 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">応募履歴</h1>
+    
+    {% if user.is_authenticated and user.role == 'seeker' %}
+        {% if applications %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>求人タイトル</th>
+                            <th>企業名</th>
+                            <th>応募日</th>
+                            <th>ステータス</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                            <tr>
+                                <td>{{ application.job.title }}</td>
+                                <td>{{ application.job.company.company_name }}</td>
+                                <td>{{ application.applied_date|date:"Y年m月d日" }}</td>
+                                <td>
+                                    <span class="badge 
+                                      {% if application.status == 'applied' %}bg-secondary
+                                      {% elif application.status == 'screening' %}bg-info
+                                      {% elif application.status == 'interview' %}bg-primary
+                                      {% elif application.status == 'offer' %}bg-success
+                                      {% elif application.status == 'rejected' %}bg-danger
+                                      {% elif application.status == 'accepted' %}bg-success
+                                      {% endif %}">
+                                        {{ application.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'jobs:job_detail' application.job.id %}" class="btn btn-sm btn-outline-primary">詳細</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">選考ステータスについて</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">応募済み</span>
+                                    <span>応募が完了し、企業による書類確認待ちです</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-info me-2">書類選考中</span>
+                                    <span>企業が応募書類を確認中です</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-primary me-2">面接中</span>
+                                    <span>面接プロセスが進行中です</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">内定</span>
+                                    <span>内定が出ています。おめでとうございます！</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-danger me-2">不採用</span>
+                                    <span>残念ながら、この求人では採用に至りませんでした</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <span class="badge bg-success me-2">内定承諾</span>
+                                    <span>内定を承諾し、入社手続きが進行中です</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                まだ応募した求人はありません。
+            </div>
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">求人を探す</a>
+                <a href="{% url 'jobs:recommended_jobs' %}" class="btn btn-outline-secondary">おすすめ求人を見る</a>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning">
+            応募履歴を表示するには、求職者としてログインしてください。
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary">新規登録</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

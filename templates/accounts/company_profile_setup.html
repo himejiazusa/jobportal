@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}企業プロフィール設定 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">企業プロフィール設定</h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">企業情報を入力して、求職者にあなたの会社について知ってもらいましょう。</p>
+                
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.company_name.id_for_label }}" class="form-label">{{ form.company_name.label }}</label>
+                        {{ form.company_name }}
+                        {% if form.company_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.company_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.industry.id_for_label }}" class="form-label">{{ form.industry.label }}</label>
+                        {{ form.industry }}
+                        {% if form.industry.errors %}
+                            <div class="text-danger">
+                                {% for error in form.industry.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger">
+                                {% for error in form.description.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.website.id_for_label }}" class="form-label">{{ form.website.label }}</label>
+                        {{ form.website }}
+                        {% if form.website.errors %}
+                            <div class="text-danger">
+                                {% for error in form.website.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.founded_year.id_for_label }}" class="form-label">{{ form.founded_year.label }}</label>
+                        {{ form.founded_year }}
+                        {% if form.founded_year.errors %}
+                            <div class="text-danger">
+                                {% for error in form.founded_year.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.logo.id_for_label }}" class="form-label">{{ form.logo.label }}</label>
+                        {{ form.logo }}
+                        {% if form.logo.errors %}
+                            <div class="text-danger">
+                                {% for error in form.logo.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">企業ロゴをアップロードしてください（JPG, PNG形式推奨）。</small>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">プロフィールを保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

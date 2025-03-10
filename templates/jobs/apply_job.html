@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}応募 - {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">求人に応募</h3>
+                    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-secondary">キャンセル</a>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3">{{ job.title }}</h4>
+                    <p class="text-muted mb-4">
+                        {{ job.company.company_name }} | {{ job.location }} | {{ job.get_job_type_display }}
+                    </p>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.cover_letter.id_for_label }}" class="form-label">{{ form.cover_letter.label }}</label>
+                            {{ form.cover_letter }}
+                            {% if form.cover_letter.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.cover_letter.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">あなたのスキルや経験が、この求人にどのように適しているかを記入してください。</small>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">応募情報</h5>
+                            <p>応募すると、企業はあなたのプロフィール情報（以下）を閲覧できるようになります：</p>
+                            <ul>
+                                <li>希望給与: {% if user.seeker_profile.desired_salary %}{{ user.seeker_profile.desired_salary }}万円{% else %}未設定{% endif %}</li>
+                                <li>希望勤務地: {% if user.seeker_profile.preferred_location %}{{ user.seeker_profile.preferred_location }}{% else %}未設定{% endif %}</li>
+                                <li>経験年数: {{ user.seeker_profile.years_experience }}年</li>
+                                <li>スキル: 
+                                    {% for skill in user.seeker_profile.skills.all %}
+                                        {{ skill.name }}{% if not forloop.last %}, {% endif %}
+                                    {% empty %}
+                                        未設定
+                                    {% endfor %}
+                                </li>
+                                <li>履歴書: {% if user.seeker_profile.resume %}アップロード済み{% else %}未アップロード{% endif %}</li>
+                            </ul>
+                            {% if not user.seeker_profile.resume %}
+                                <div class="alert alert-warning">
+                                    <strong>注意:</strong> 履歴書がアップロードされていません。プロフィールを編集して履歴書をアップロードすることをお勧めします。
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">応募する</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

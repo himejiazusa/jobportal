@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}企業ダッシュボード - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ user.company_profile.company_name }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            {% if user.company_profile.logo %}
+                                <img src="{{ user.company_profile.logo.url }}" alt="{{ user.company_profile.company_name }}" class="img-fluid mb-3" style="max-height: 150px;">
+                            {% endif %}
+                            <div>
+                                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary">企業プロフィール編集</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table">
+                            <tr>
+                                <th>業種</th>
+                                <td>{{ user.company_profile.industry }}</td>
+                            </tr>
+                            <tr>
+                                <th>Webサイト</th>
+                                <td>
+                                    {% if user.company_profile.website %}
+                                        <a href="{{ user.company_profile.website }}" target="_blank">{{ user.company_profile.website }}</a>
+                                    {% else %}
+                                        未設定
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>設立年</th>
+                                <td>
+                                    {% if user.company_profile.founded_year %}
+                                        {{ user.company_profile.founded_year }}年
+                                    {% else %}
+                                        未設定
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>会社概要</th>
+                                <td>{{ user.company_profile.description }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">掲載中の求人</h4>
+                <a href="{% url 'jobs:create_job' %}" class="btn btn-primary">新規求人登録</a>
+            </div>
+            <div class="card-body">
+                {% if jobs_with_application_count %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>タイトル</th>
+                                    <th>勤務地</th>
+                                    <th>雇用形態</th>
+                                    <th>掲載日</th>
+                                    <th>応募者数</th>
+                                    <th>ステータス</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs_with_application_count %}
+                                    <tr>
+                                        <td><a href="{% url 'jobs:job_detail' job.id %}">{{ job.title }}</a></td>
+                                        <td>{{ job.location }}</td>
+                                        <td>{{ job.get_job_type_display }}</td>
+                                        <td>{{ job.posted_date|date:"Y/m/d" }}</td>
+                                        <td>
+                                            <a href="{% url 'jobs:view_applicants' job.id %}">
+                                                {{ job.application_count }}名
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if job.is_active %}
+                                            <span class="badge bg-success">掲載中</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">非掲載</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{% url 'jobs:edit_job' job.id %}" class="btn btn-outline-primary">編集</a>
+                                                    <a href="{% url 'jobs:view_applicants' job.id %}" class="btn btn-outline-info">応募者</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p>掲載中の求人はありません。</p>
+                            <p class="mb-0">「新規求人登録」ボタンから求人を登録しましょう。</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

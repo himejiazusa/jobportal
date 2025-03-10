@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}ミッション一覧 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">ミッション</h1>
+    
+    {% if user.is_authenticated %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="card-title">ミッションをクリアしてポイントを獲得しましょう！</h5>
+                        <p class="card-text">様々なアクションを完了すると、ポイントが貯まります。ポイントは今後のサービス拡充に伴い、特典と交換できるようになる予定です。</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="display-4 fw-bold">{{ user.points }}</div>
+                        <p class="text-muted">獲得ポイント</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 未完了のミッション -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="card-title mb-0">未達成のミッション</h4>
+            </div>
+            <div class="card-body">
+                {% if incomplete_missions %}
+                    <div class="list-group">
+                        {% for mission_data in incomplete_missions %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h5 class="mb-1">{{ mission_data.mission.name }}</h5>
+                                    <span class="badge bg-primary">+{{ mission_data.mission.points }}ポイント</span>
+                                </div>
+                                <p class="mb-1">{{ mission_data.mission.description }}</p>
+                                {% if mission_data.mission.is_recurring %}
+                                    <small class="text-success">※このミッションは何度でも達成できます</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-success">
+                        すべてのミッションを達成しました！おめでとうございます！
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- 達成済みのミッション -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">達成済みのミッション</h4>
+            </div>
+            <div class="card-body">
+                {% if completed_missions %}
+                    <div class="list-group">
+                        {% for mission_data in completed_missions %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h5 class="mb-1">{{ mission_data.mission.name }}</h5>
+                                    <span class="badge bg-success">+{{ mission_data.mission.points }}ポイント</span>
+                                </div>
+                                <p class="mb-1">{{ mission_data.mission.description }}</p>
+                                <small class="text-muted">達成日: {{ mission_data.completed_date|date:"Y年m月d日" }}</small>
+                                {% if mission_data.mission.is_recurring %}
+                                    <br><small class="text-success">※このミッションは何度でも達成できます</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        まだミッションを達成していません。上記のミッションに挑戦してポイントを獲得しましょう！
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            ミッション機能を利用するには、ログインしてください。
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary">新規登録</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

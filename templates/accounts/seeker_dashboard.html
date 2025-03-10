@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}マイページ - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ user.username }}さん、こんにちは</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <div class="mb-2">
+                                <h4>プロフィール</h4>
+                            </div>
+                            <div>
+                                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary">プロフィール編集</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">ポイント</h5>
+                                <p class="card-text display-4 text-center">{{ user.points }}</p>
+                                <p class="text-muted text-center">ミッションをクリアしてポイントを獲得しましょう！</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>あなたの情報</h4>
+                        <table class="table">
+                            <tr>
+                                <th>メールアドレス</th>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>希望給与</th>
+                                <td>
+                                    {% if user.seeker_profile.desired_salary %}
+                                        {{ user.seeker_profile.desired_salary }}万円
+                                    {% else %}
+                                        未設定
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>希望勤務地</th>
+                                <td>
+                                    {% if user.seeker_profile.preferred_location %}
+                                        {{ user.seeker_profile.preferred_location }}
+                                    {% else %}
+                                        未設定
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>経験年数</th>
+                                <td>{{ user.seeker_profile.years_experience }}年</td>
+                            </tr>
+                            <tr>
+                                <th>スキル</th>
+                                <td>
+                                    {% for skill in user.seeker_profile.skills.all %}
+                                        <span class="badge bg-primary">{{ skill.name }}</span>
+                                    {% empty %}
+                                        未設定
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="card-title">応募した求人</h4>
+            </div>
+            <div class="card-body">
+                {% if applications %}
+                    <div class="list-group">
+                        {% for application in applications %}
+                            <a href="{% url 'jobs:job_detail' application.job.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ application.job.title }}</h5>
+                                    <small class="text-muted">{{ application.applied_date|date:"Y/m/d" }}</small>
+                                </div>
+                                <p class="mb-1">{{ application.job.company.company_name }}</p>
+                                <span class="badge 
+                                      {% if application.status == 'applied' %}bg-secondary
+                                      {% elif application.status == 'screening' %}bg-info
+                                      {% elif application.status == 'interview' %}bg-primary
+                                      {% elif application.status == 'offer' %}bg-success
+                                      {% elif application.status == 'rejected' %}bg-danger
+                                      {% elif application.status == 'accepted' %}bg-success
+                                      {% endif %}">
+                                    {{ application.get_status_display }}
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center">まだ応募した求人はありません。</p>
+                    <div class="d-grid">
+                        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">求人を探す</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="card-title">お気に入り求人</h4>
+            </div>
+            <div class="card-body">
+                {% if saved_jobs %}
+                    <div class="list-group">
+                        {% for saved in saved_jobs %}
+                            <a href="{% url 'jobs:job_detail' saved.job.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ saved.job.title }}</h5>
+                                    <small class="text-muted">{{ saved.saved_date|date:"Y/m/d" }}</small>
+                                </div>
+                                <p class="mb-1">{{ saved.job.company.company_name }}</p>
+                                {% if saved.job.salary_min and saved.job.salary_max %}
+                                    <small class="text-muted">給与: {{ saved.job.salary_min }}〜{{ saved.job.salary_max }}万円</small>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center">まだお気に入りの求人はありません。</p>
+                    <div class="d-grid">
+                        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">求人を探す</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">達成したミッション</h4>
+            </div>
+            <div class="card-body">
+                {% if completed_missions %}
+                    <div class="list-group">
+                        {% for user_mission in completed_missions %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ user_mission.mission.name }}</h5>
+                                    <span class="badge bg-success">+{{ user_mission.mission.points }}ポイント</span>
+                                </div>
+                                <p class="mb-1">{{ user_mission.mission.description }}</p>
+                                <small class="text-muted">達成日: {{ user_mission.completed_date|date:"Y/m/d" }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center">まだミッションを達成していません。</p>
+                    <div class="d-grid">
+                        <a href="{% url 'missions:mission_list' %}" class="btn btn-primary">ミッション一覧を見る</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

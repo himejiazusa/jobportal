@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}新規求人登録 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">新規求人登録</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.title.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.location.id_for_label }}" class="form-label">{{ form.location.label }}</label>
+                                {{ form.location }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.location.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.job_type.id_for_label }}" class="form-label">{{ form.job_type.label }}</label>
+                                {{ form.job_type }}
+                                {% if form.job_type.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.job_type.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.salary_min.id_for_label }}" class="form-label">{{ form.salary_min.label }}</label>
+                                {{ form.salary_min }}
+                                {% if form.salary_min.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.salary_min.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.salary_max.id_for_label }}" class="form-label">{{ form.salary_max.label }}</label>
+                                {{ form.salary_max }}
+                                {% if form.salary_max.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.salary_max.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">求人内容、業務内容、会社の特徴などを記載してください。</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.requirements.id_for_label }}" class="form-label">{{ form.requirements.label }}</label>
+                            {{ form.requirements }}
+                            {% if form.requirements.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.requirements.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">応募条件、必要なスキルや経験、資格などを記載してください。</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.skills_required.label }}</label>
+                            <div class="row">
+                                {% for skill in form.skills_required %}
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-check">
+                                            {{ skill.tag }}
+                                            <label class="form-check-label" for="{{ skill.id_for_label }}">
+                                                {{ skill.choice_label }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.skills_required.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.skills_required.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.deadline.id_for_label }}" class="form-label">{{ form.deadline.label }}</label>
+                                {{ form.deadline }}
+                                {% if form.deadline.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.deadline.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                        {{ form.is_active.label }}
+                                    </label>
+                                </div>
+                                {% if form.is_active.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.is_active.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">求人を登録</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}お気に入り求人 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">お気に入り求人</h1>
+    
+    {% if user.is_authenticated and user.role == 'seeker' %}
+        {% if saved_jobs %}
+            <div class="row">
+                {% for saved in saved_jobs %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ saved.job.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ saved.job.company.company_name }}</h6>
+                                
+                                <p class="card-text">
+                                    <span class="badge bg-primary">{{ saved.job.get_job_type_display }}</span>
+                                    <span class="badge bg-secondary">{{ saved.job.location }}</span>
+                                </p>
+                                
+                                {% if saved.job.salary_min or saved.job.salary_max %}
+                                    <p class="card-text">
+                                        <strong>給与:</strong> 
+                                        {% if saved.job.salary_min %}{{ saved.job.salary_min }}万円{% endif %}
+                                        {% if saved.job.salary_min and saved.job.salary_max %}〜{% endif %}
+                                        {% if saved.job.salary_max %}{{ saved.job.salary_max }}万円{% endif %}
+                                    </p>
+                                {% endif %}
+                                
+                                <p class="card-text">{{ saved.job.description|truncatewords:30 }}</p>
+                                
+                                <div class="mt-3 d-flex gap-2">
+                                    <a href="{% url 'jobs:job_detail' saved.job.id %}" class="btn btn-outline-primary flex-grow-1">詳細を見る</a>
+                                    <form method="post" action="{% url 'jobs:unsave_job' saved.job.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="bi bi-heart-fill"></i> 削除
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>お気に入り登録日: {{ saved.saved_date|date:"Y年m月d日" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                お気に入りに追加した求人はありません。
+            </div>
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">求人を探す</a>
+                <a href="{% url 'jobs:recommended_jobs' %}" class="btn btn-outline-secondary">おすすめ求人を見る</a>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning">
+            お気に入り求人を表示するには、求職者としてログインしてください。
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary">新規登録</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

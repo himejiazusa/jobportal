@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}ホーム - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 共通のトップセクション -->
+    <div class="jumbotron">
+        <h1 class="display-4">求人WEBアプリへようこそ</h1>
+        {% if user.is_authenticated %}
+            {% if user.role == 'employer' %}
+                <p class="lead">優秀な人材を見つけて、あなたの企業の成長を加速させましょう。</p>
+                <hr class="my-4">
+                <p>求人掲載、応募者管理、選考プロセスの追跡などの機能が利用できます。</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a class="btn btn-primary btn-lg" href="{% url 'jobs:create_job' %}" role="button">新規求人を掲載</a>
+                    <a class="btn btn-outline-primary btn-lg" href="{% url 'jobs:company_jobs' %}" role="button">掲載中の求人を確認</a>
+                </div>
+            {% elif user.role == 'seeker' %}
+                <p class="lead">あなたのキャリアを次のステップへ。理想の仕事を見つけましょう。</p>
+                <hr class="my-4">
+                <p>求人検索、応募、選考状況の管理まで、すべてこのアプリで完結します。</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a class="btn btn-primary btn-lg" href="{% url 'jobs:job_list' %}" role="button">求人を探す</a>
+                    <a class="btn btn-outline-primary btn-lg" href="{% url 'jobs:recommended_jobs' %}" role="button">おすすめ求人</a>
+                </div>
+            {% endif %}
+        {% else %}
+            <p class="lead">あなたのキャリアを次のステップへ。理想の仕事を見つけましょう。</p>
+            <hr class="my-4">
+            <p>求人検索、応募、選考状況の管理まで、すべてこのアプリで完結します。</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}" role="button">新規登録</a>
+                <a class="btn btn-outline-primary btn-lg" href="{% url 'accounts:login' %}" role="button">ログイン</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ユーザーロールに応じたセクション -->
+    {% if user.is_authenticated %}
+        {% if user.role == 'employer' %}
+            <!-- 企業向けセクション -->
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>掲載中の求人</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if jobs %}
+                                <div class="list-group">
+                                    {% for job in jobs|slice:":3" %}
+                                        <a href="{% url 'jobs:job_detail' job.id %}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ job.title }}</h5>
+                                                <small>{{ job.posted_date|date:"Y/m/d" }}</small>
+                                            </div>
+                                            <p class="mb-1">応募者数: {{ job.application_count|default:"0" }}名</p>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                                {% if jobs|length > 3 %}
+                                    <div class="mt-2 text-center">
+                                        <a href="{% url 'jobs:company_jobs' %}" class="btn btn-sm btn-outline-primary">すべての求人を見る</a>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <p>掲載中の求人はありません。</p>
+                                <div class="d-grid">
+                                    <a href="{% url 'jobs:create_job' %}" class="btn btn-primary">新規求人を掲載</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>採用のヒント</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item">
+                                    <h6 class="mb-1">魅力的な求人タイトル</h6>
+                                    <p class="mb-1 text-muted">求職者の検索結果で目立つ、具体的で魅力的なタイトルを付けましょう。</p>
+                                </div>
+                                <div class="list-group-item">
+                                    <h6 class="mb-1">詳細な職務内容</h6>
+                                    <p class="mb-1 text-muted">業務内容や責任範囲を具体的に記載することで、適切な候補者からの応募が増えます。</p>
+                                </div>
+                                <div class="list-group-item">
+                                    <h6 class="mb-1">給与情報を明示</h6>
+                                    <p class="mb-1 text-muted">給与範囲を明記することで、応募者とのミスマッチを減らすことができます。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-2">
+                <div class="card-header">
+                    <h5>企業プロフィール</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.company_profile %}
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>{{ user.company_profile.company_name }}</h5>
+                                <p>{{ user.company_profile.description|truncatewords:50 }}</p>
+                                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary">プロフィールを編集</a>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                {% if user.company_profile.logo %}
+                                    <img src="{{ user.company_profile.logo.url }}" alt="{{ user.company_profile.company_name }}" class="img-fluid mb-3" style="max-height: 100px;">
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <p>企業ロゴが設定されていません</p>
+                                        <a href="{% url 'accounts:edit_profile' %}">ロゴをアップロード</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p>企業プロフィールが未設定です。プロフィールを設定して、求職者にあなたの会社について知ってもらいましょう。</p>
+                            <a href="{% url 'accounts:profile_setup' %}" class="btn btn-primary">プロフィールを設定</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+        {% elif user.role == 'seeker' %}
+            <!-- 求職者向けセクション（元のまま） -->
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">求人検索</h5>
+                            <p class="card-text">あなたのスキルや希望に合った求人を探しましょう。</p>
+                            <a href="{% url 'jobs:job_list' %}" class="btn btn-outline-primary">求人一覧へ</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">おすすめ求人</h5>
+                            <p class="card-text">あなたのスキルと希望条件に基づいた求人をご紹介します。</p>
+                            <a href="{% url 'jobs:recommended_jobs' %}" class="btn btn-outline-primary">おすすめ求人を見る</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">ミッションに挑戦</h5>
+                            <p class="card-text">様々なミッションをクリアしてポイントを獲得しましょう。</p>
+                            <a href="{% url 'missions:mission_list' %}" class="btn btn-outline-primary">ミッション一覧へ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- 未ログインユーザー向けセクション（元のまま） -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">求人検索</h5>
+                        <p class="card-text">あなたのスキルや希望に合った求人を探しましょう。</p>
+                        <a href="{% url 'jobs:job_list' %}" class="btn btn-outline-primary">求人一覧へ</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">企業の方へ</h5>
+                        <p class="card-text">求人を掲載して、優秀な人材を見つけましょう。</p>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary">企業登録へ</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">ミッションに挑戦</h5>
+                        <p class="card-text">様々なミッションをクリアしてポイントを獲得しましょう。</p>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary">会員登録へ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

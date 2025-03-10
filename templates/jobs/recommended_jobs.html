@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}おすすめ求人 - 求人WEBアプリ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">あなたにおすすめの求人</h1>
+    
+    {% if user.is_authenticated and user.role == 'seeker' %}
+        <div class="alert alert-info mb-4">
+            <p><strong>{{ user.username }}</strong>さんのスキルと希望条件に基づいたおすすめ求人です。</p>
+            <p class="mb-0">プロフィール情報をさらに充実させると、より適切な求人をご紹介できます。</p>
+        </div>
+        
+        <!-- 求人リスト -->
+        {% if jobs %}
+            <div class="row">
+                {% for job in jobs %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ job.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ job.company.company_name }}</h6>
+                                
+                                <p class="card-text">
+                                    <span class="badge bg-primary">{{ job.get_job_type_display }}</span>
+                                    <span class="badge bg-secondary">{{ job.location }}</span>
+                                </p>
+                                
+                                {% if job.salary_min or job.salary_max %}
+                                    <p class="card-text">
+                                        <strong>給与:</strong> 
+                                        {% if job.salary_min %}{{ job.salary_min }}万円{% endif %}
+                                        {% if job.salary_min and job.salary_max %}〜{% endif %}
+                                        {% if job.salary_max %}{{ job.salary_max }}万円{% endif %}
+                                    </p>
+                                {% endif %}
+                                
+                                {% if job.skills_required.all %}
+                                    <p class="card-text">
+                                        <strong>必要スキル:</strong><br>
+                                        {% for skill in job.skills_required.all %}
+                                            <span class="badge {% if skill in user.seeker_profile.skills.all %}bg-success{% else %}bg-light text-dark{% endif %} me-1">
+                                                {{ skill.name }}
+                                            </span>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                                
+                                <p class="card-text">{{ job.description|truncatewords:30 }}</p>
+                                
+                                <div class="mt-3 d-grid gap-2">
+                                    <a href="{% url 'jobs:job_detail' job.id %}" class="btn btn-outline-primary">詳細を見る</a>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>掲載日: {{ job.posted_date|date:"Y年m月d日" }}</small>
+                                {% if job.deadline %}
+                                    <small class="float-end">応募締切: {{ job.deadline|date:"Y年m月d日" }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                現在おすすめできる求人がありません。プロフィールを更新するか、条件を変えて求人を探してみてください。
+            </div>
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">すべての求人を見る</a>
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-secondary">プロフィールを更新する</a>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-warning">
+            おすすめ求人を表示するには、求職者としてログインしてください。
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">ログイン</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline-secondary">新規登録</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
