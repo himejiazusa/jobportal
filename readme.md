@@ -187,4 +187,4 @@ gunicorn jobportal.wsgi:application
 
 ## 連絡先
 
-質問や問題がある場合は、issueを作成するか、email@example.com までご連絡ください。
+質問や問題がある場合は、issueを作成するか、fairywoods.azusa@gmail.com までご連絡ください。
